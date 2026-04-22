@@ -542,7 +542,7 @@
 
             function playLocalPlaylist() {
                 console.log("Starting local media playlist...");
-                video.volume = 0.2;
+                video.volume = 0.4;
                 if (localMediaFiles.length === 0) {
                     alert("Local media list is empty or still loading. Please try again.");
                     return;
@@ -572,15 +572,14 @@
                     localOption.textContent = 'Local Media Playlist';
                     channelSelect.appendChild(localOption);
 
-                    const defaultChannelName = "TV1";
-                    const defaultChannel = channels.find(channel => channel.name === defaultChannelName);
-
-                    if (defaultChannel) {
-                        channelSelect.value = defaultChannel.url;
-                        loadChannel();
-                    }
+                    channelSelect.value = 'local_media_playlist';
+                    loadChannel();
+                    
                 } catch (error) {
                     console.error('Failed to load or parse playlist:', error);
+                // Fallback: Even if M3U fails, try to load local media
+                    channelSelect.value = 'local_media_playlist';
+                    loadChannel();
                 }
             }
 
@@ -632,10 +631,21 @@
                     alert('Unsupported stream type.');
                 }
             }
+            
+                // Create an async initialization function to control the loading order
+                async function initializeApp() {
+                // 1. Await the local media fetch first so the array is populated
+                await fetchLocalMedia();
+                
+                // 2. Then load the playlist, which will now safely trigger the default local playback
+                await loadPlaylist();
+                
+                // 3. Finally, attach the change listener for the dropdown menu
+                channelSelect.addEventListener('change', loadChannel);
+            }
 
-            loadPlaylist();
-            fetchLocalMedia();
-            channelSelect.addEventListener('change', loadChannel);
+            // Run the initialization sequence
+            initializeApp();
 
             document.addEventListener('keydown', (event) => {
                 const keyName = event.key;
