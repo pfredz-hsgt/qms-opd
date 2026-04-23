@@ -336,13 +336,18 @@
             </div>
         </div>
 
-        <div class="row">
-            <!-- Left Column: Chart -->
+<div class="row">
             <div class="col-lg-8">
+                <div class="chart-container">
+                    <h5 class="fw-bold mb-3">Hourly Call Volume (8 AM - 5 PM)</h5>
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+
                 <div class="chart-container">
                     <h5 class="fw-bold mb-3">Call Volume Statistics</h5>
                     <canvas id="callsChart"></canvas>
                 </div>
+
                 <h4 id="selected-date-header" class="text-primary fw-bold mb-4"></h4>
                 <div class="table-custom">
                     <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
@@ -394,6 +399,7 @@ document.getElementById("todayDate").textContent = formattedDate;
         // State
         let currentData = [];
         let myChart = null;
+        let hourlyChart = null;
 
         // Initialization
         document.addEventListener('DOMContentLoaded', function () {
@@ -520,6 +526,7 @@ document.getElementById("todayDate").textContent = formattedDate;
 
             renderTable(data);
             renderCounterStats(data);
+            renderHourlyChart(data);
         }
 
         function renderTable(data) {
@@ -592,6 +599,72 @@ document.getElementById("todayDate").textContent = formattedDate;
                 `;
             }).join('');
         }
+
+function renderHourlyChart(data) {
+            const ctx = document.getElementById('hourlyChart');
+
+            // Define the hours we want to track (8 AM to 5 PM)
+            const hoursToTrack = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+            const labels = ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM'];
+            
+            // Create an array to hold the counts, initialized to 0
+            const hourlyCounts = new Array(10).fill(0);
+
+            // Loop through data and group by hour
+            data.forEach(row => {
+                if (row.time) {
+                    // Extract the hour (e.g., "08:15" becomes 8, "14:30" becomes 14)
+                    const hour = parseInt(row.time.split(':')[0], 10);
+                    
+                    // Find which bucket this belongs to
+                    const bucketIndex = hoursToTrack.indexOf(hour);
+                    if (bucketIndex !== -1) {
+                        hourlyCounts[bucketIndex]++;
+                    }
+                }
+            });
+
+            // Destroy previous chart instance if it exists to prevent overlap
+            if (hourlyChart) {
+                hourlyChart.destroy();
+            }
+
+            // Draw the line chart
+            hourlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Calls Processed',
+                        data: hourlyCounts,
+                        borderColor: '#00bcd4', // Uses your --accent-cyan color
+                        backgroundColor: 'rgba(0, 188, 212, 0.1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#1a237e', // Uses your --primary-navy color
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.3 // Adds a slight curve to the line
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { borderDash: [2, 4] },
+                            ticks: { precision: 0 } // Ensures whole numbers on Y axis
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+        
+
 
         function renderChart(labels, data) {
             const ctx = document.getElementById('callsChart');

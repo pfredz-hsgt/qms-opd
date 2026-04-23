@@ -94,7 +94,7 @@ function updateHistoryUI(data) {
     } else {
         recentCallsPreviewEl.innerHTML = previewItems.map(item => `
             <div class="badge bg-white text-dark border p-2">
-                <div class="fs-6 fw-bold">${item.number}</div>
+                <div class="fs-4 fw-bold pb-1">${item.number}</div>
                 <div class="micro-text text-muted" style="font-size:0.7rem">Kaunter ${item.counter}</div>
             </div>
         `).join('');
