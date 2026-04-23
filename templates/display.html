@@ -588,7 +588,9 @@
                     const res = await fetch('/api/media-list');
                     const data = await res.json();
                     if (data.status === 'success' && data.media_files.length > 0) {
-                        localMediaFiles = data.media_files;
+                        localMediaFiles = data.media_files.sort((a, b) => 
+                            a.toLowerCase().localeCompare(b.toLowerCase())
+                        );
                         console.log(`📹 Loaded ${localMediaFiles.length} local media files`);
                     }
                 } catch (error) {
