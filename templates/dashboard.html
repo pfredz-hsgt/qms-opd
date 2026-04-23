@@ -468,19 +468,40 @@ document.getElementById("todayDate").textContent = formattedDate;
             if (el) el.textContent = text;
         }
 
-        // Function to fetch last 5 days data for the chart
+// Function to fetch last 5 working days data for the chart
         async function updateChartWithHistory() {
-            // We want to show Today and previous 4 days
             const labels = [];
-            const dataPoints = [];
             const datesToFetch = [];
+            let daysLookedBack = 0;
+            let validDaysFound = 0;
 
-            for (let i = 4; i >= 0; i--) {
+            // Loop backward in time until we have exactly 5 weekdays
+            while (validDaysFound < 5) {
                 const d = new Date();
-                d.setDate(d.getDate() - i);
-                const dateStr = d.toISOString().split('T')[0];
-                datesToFetch.push(dateStr);
-                labels.push(i === 0 ? 'Today' : dateStr.slice(5)); // Show MM-DD
+                d.setDate(d.getDate() - daysLookedBack);
+                const dayOfWeek = d.getDay(); // 0 is Sunday, 6 is Saturday
+
+                // If it is NOT Sunday (0) and NOT Saturday (6)
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    
+                    // Extract local date parts safely
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    
+                    // Format YYYY-MM-DD for the API fetch
+                    const dateStr = `${year}-${month}-${day}`; 
+                    
+                    // Format DD/MM for the chart label
+                    const formattedLabel = (daysLookedBack === 0) ? 'Today' : `${day}/${month}`;
+
+                    // Add to the beginning of the array so chronological order is maintained (oldest to newest)
+                    datesToFetch.unshift(dateStr);
+                    labels.unshift(formattedLabel);
+                    
+                    validDaysFound++; // Increment our count of valid days found
+                }
+                daysLookedBack++; // Move one day further into the past
             }
 
             // Fetch in parallel
@@ -500,6 +521,8 @@ document.getElementById("todayDate").textContent = formattedDate;
                 console.error("Failed to load chart history", e);
             }
         }
+
+
 
         async function loadStats() {
             try {
