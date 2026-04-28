@@ -287,7 +287,7 @@
             </div>
             <div>
                 <button class="btn btn-outline-primary" onclick="loadTodayData()">Today's Data</button>
-                <button class="btn btn-outline-secondary" onclick="loadRecentData()">Show All Recent</button>
+                <button class="btn btn-outline-secondary" onclick="loadRecentData()">Patient Count</button>
             </div>
         </div>
 
@@ -339,12 +339,12 @@
 <div class="row">
             <div class="col-lg-8">
                 <div class="chart-container">
-                    <h5 class="fw-bold mb-3">Hourly Call Volume (8 AM - 5 PM)</h5>
+                    <h5 class="fw-bold mb-3">Hourly Call Volume</h5>
                     <canvas id="hourlyChart"></canvas>
                 </div>
 
                 <div class="chart-container">
-                    <h5 class="fw-bold mb-3">Call Volume Statistics</h5>
+                    <h5 class="fw-bold mb-3">Daily Statistics</h5>
                     <canvas id="callsChart"></canvas>
                 </div>
 
@@ -353,7 +353,7 @@
                     <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
                         <h5 class="fw-bold mb-0">Detailed Call Logs</h5>
 
-                        <span class="badge bg-light text-dark border" id="table-count-badge">0 records</span>
+                        <span class="badge bg-light text-dark border fs-6" id="table-count-badge">0 Records</span>
                     </div>
                     <div class="table-responsive" id="table-content">
                         <!-- Table injected via JS -->
@@ -383,6 +383,7 @@
     <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/static/vendor/chartjs/chart.umd.min.js"></script>
     <script src="/static/vendor/sheetjs/xlsx.full.min.js"></script>
+    <script src="/static/vendor/chartjs/chartjs-plugin-datalabels@2.0.0.js"></script>
 
     <script>
     
@@ -423,17 +424,28 @@ document.getElementById("todayDate").textContent = formattedDate;
             await loadDataForDate();
         }
 
-        async function loadRecentData() {
-            document.getElementById('date-filter').value = '';
+async function loadRecentData() {
+            // 1. Set the date filter to today's date
+            const selectedDate = document.getElementById('date-filter').value;
             document.getElementById('number-search').value = ''; // Clear search
-            updateDateHeader('Recent Records (Last 500)');
+            
+            updateDateHeader(`Unique Patients`);
 
             showLoading(true);
             try {
-                const response = await fetch('/api/logs/recent?limit=500');
+                // 2. Fetch data specifically for today
+                const response = await fetch(`/api/logs/date/${selectedDate}`);
                 const result = await response.json();
+                
                 if (result.status === 'success') {
-                    processData(result.data);
+                    // 3. Filter for unique numbers (removes duplicate calls from the same number)
+                    const uniqueData = result.data.filter((row, index, self) =>
+                        index === self.findIndex((t) => t.number === row.number)
+                    );
+                    
+                    // 4. Process the filtered data and update the charts
+                    processData(uniqueData);
+                    updateChartWithHistory();
                 }
             } catch (error) {
                 console.error(error);
@@ -446,7 +458,7 @@ document.getElementById("todayDate").textContent = formattedDate;
             // Clear search when changing date
             document.getElementById('number-search').value = '';
 
-            if (!selectedDate) return loadRecentData();
+            if (!selectedDate) return loadTodayData();
 
             updateDateHeader(`Data for ${selectedDate}`);
             showLoading(true);
@@ -493,7 +505,7 @@ document.getElementById("todayDate").textContent = formattedDate;
                     const dateStr = `${year}-${month}-${day}`; 
                     
                     // Format DD/MM for the chart label
-                    const formattedLabel = (daysLookedBack === 0) ? 'Today' : `${day}/${month}`;
+                    const formattedLabel = (daysLookedBack === 0) ? 'Today' : `${day}/${month}/${year}`;
 
                     // Add to the beginning of the array so chronological order is maintained (oldest to newest)
                     datesToFetch.unshift(dateStr);
@@ -658,7 +670,7 @@ function renderHourlyChart(data) {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Calls Processed',
+                        label: 'No of Pts',
                         data: hourlyCounts,
                         borderColor: '#00bcd4', // Uses your --accent-cyan color
                         backgroundColor: 'rgba(0, 188, 212, 0.1)',
@@ -690,36 +702,67 @@ function renderHourlyChart(data) {
 
 
         function renderChart(labels, data) {
-            const ctx = document.getElementById('callsChart');
+    const ctx = document.getElementById('callsChart');
 
-            if (myChart) {
-                myChart.destroy();
-            }
+    if (myChart) {
+        myChart.destroy();
+    }
 
-            myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Calls Processed',
-                        data: data,
-                        backgroundColor: '#1a237e',
-                        borderRadius: 5,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
+    myChart = new Chart(ctx, {
+        type: 'bar',
+        plugins: [ChartDataLabels], // Register the plugin here
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Patient Count',
+                data: data,
+                backgroundColor: '#1a237e',
+                borderRadius: 5,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                // --- DATA LABELS CONFIG ---
+                datalabels: {
+                    anchor: 'end',      // Position at the top of the bar
+                    align: 'top',       // Align above the anchor
+                    color: '#1a237e',   // Label color
+                    font: {
+                        weight: 'bold',
+                        size: 12
                     },
-                    scales: {
-                        y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
-                        x: { grid: { display: false } }
+                    formatter: (value) => value > 0 ? value : '' // Hide if 0
+                }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    grid: { borderDash: [2, 4] },
+                    // Extra padding at the top so labels don't get cut off
+                    suggestedMax: Math.max(...data) + 2 
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: {
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
                     }
                 }
-            });
+            },
+            // Add padding to layout to ensure top labels are visible
+            layout: {
+                padding: {
+                    top: 20
+                }
+            }
         }
+    });
+}
 
         // --- Export ---
 

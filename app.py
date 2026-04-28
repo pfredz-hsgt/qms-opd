@@ -676,7 +676,7 @@ def get_active_notifications():
 def get_recent_logs():
     """Get recent call logs from CSV."""
     try:
-        limit = min(int(request.args.get('limit', 10)), 100)  # Max 100 records
+        limit = min(int(request.args.get('limit', 10)), 500)  # Max 100 records
         recent_calls = csv_logger.get_recent_calls(limit)
         return jsonify({
             "status": "success",
