@@ -535,10 +535,14 @@ def media_list():
     """Return list of available media files."""
     try:
         files = media_manager.get_media_files()
+        
+        # Sort the files alphabetically (case-insensitive)
+        sorted_files = sorted(files, key=str.lower)
+        
         return jsonify({
             "status": "success",
-            "media_files": files,
-            "count": len(files)
+            "media_files": sorted_files, # Use the sorted list here
+            "count": len(sorted_files)
         })
     except Exception as e:
         logger.error(f"Error getting media list: {e}")
