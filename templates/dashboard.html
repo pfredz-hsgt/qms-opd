@@ -637,6 +637,7 @@ async function loadRecentData() {
 
 function renderHourlyChart(data) {
             const ctx = document.getElementById('hourlyChart');
+            const context = ctx.getContext('2d'); // Required for creating gradients
 
             // Define the hours we want to track (8 AM to 5 PM)
             const hoursToTrack = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
@@ -648,10 +649,7 @@ function renderHourlyChart(data) {
             // Loop through data and group by hour
             data.forEach(row => {
                 if (row.time) {
-                    // Extract the hour (e.g., "08:15" becomes 8, "14:30" becomes 14)
                     const hour = parseInt(row.time.split(':')[0], 10);
-                    
-                    // Find which bucket this belongs to
                     const bucketIndex = hoursToTrack.indexOf(hour);
                     if (bucketIndex !== -1) {
                         hourlyCounts[bucketIndex]++;
@@ -664,36 +662,78 @@ function renderHourlyChart(data) {
                 hourlyChart.destroy();
             }
 
+            // --- NEW: Create a fading gradient for the area under the line ---
+            const gradient = context.createLinearGradient(0, 0, 0, 350);
+            gradient.addColorStop(0, 'rgba(0, 188, 212, 0.4)'); // Stronger cyan at the top
+            gradient.addColorStop(1, 'rgba(0, 188, 212, 0.0)'); // Fades to completely transparent at the bottom
+
             // Draw the line chart
             hourlyChart = new Chart(ctx, {
                 type: 'line',
+                plugins: [ChartDataLabels],
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'No of Pts',
+                        label: 'Patients',
                         data: hourlyCounts,
-                        borderColor: '#00bcd4', // Uses your --accent-cyan color
-                        backgroundColor: 'rgba(0, 188, 212, 0.1)',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#1a237e', // Uses your --primary-navy color
+                        borderColor: '#00bcd4', 
+                        backgroundColor: gradient, // Applies the gradient here
+                        borderWidth: 3, // Slightly thicker line for better visibility
+                        pointBackgroundColor: '#fff', // White center for points
+                        pointBorderColor: '#1a237e', // Navy border for points
+                        pointBorderWidth: 2,
                         pointRadius: 4,
+                        pointHoverRadius: 7, // NEW: Points grow larger on hover
+                        pointHoverBackgroundColor: '#00bcd4', // NEW: Point changes color on hover
                         fill: true,
-                        tension: 0.3 // Adds a slight curve to the line
+                        tension: 0.4 // Slightly smoother curve
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    // NEW: Add layout padding so the top data labels don't get cut off
+                    layout: {
+                        padding: {
+                            top: 25 
+                        }
+                    },
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        // NEW: Cleaned up tooltip styling
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 35, 126, 0.9)', // Navy background
+                            padding: 12,
+                            displayColors: false, // Removes the color square
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Patients: ${context.parsed.y}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',      
+                            align: 'top',       
+                            color: '#1a237e',   
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: (value) => value > 0 ? value : '' 
+                        }
                     },
                     scales: {
                         y: { 
                             beginAtZero: true, 
-                            grid: { borderDash: [2, 4] },
-                            ticks: { precision: 0 } // Ensures whole numbers on Y axis
+                            grid: { borderDash: [2, 4], color: '#e0e0e0' },
+                            ticks: { precision: 0 },
+                            // NEW: Dynamically add headroom above the highest peak
+                            suggestedMax: Math.max(...hourlyCounts) + 2 
                         },
-                        x: { grid: { display: false } }
+                        x: { 
+                            grid: { display: false },
+                            ticks: { color: '#455a64', font: { weight: '500' } }
+                        }
                     }
                 }
             });
@@ -725,7 +765,6 @@ function renderHourlyChart(data) {
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                // --- DATA LABELS CONFIG ---
                 datalabels: {
                     anchor: 'end',      // Position at the top of the bar
                     align: 'top',       // Align above the anchor
