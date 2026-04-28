@@ -287,7 +287,7 @@
             </div>
             <div>
                 <button class="btn btn-outline-primary" onclick="loadTodayData()">Today's Data</button>
-                <button class="btn btn-outline-secondary" onclick="loadRecentData()">Patient Count</button>
+                <button class="btn btn-outline-secondary" onclick="loadRecentData()">Exclude Duplicates</button>
             </div>
         </div>
 
@@ -295,6 +295,19 @@
 
         <!-- Stats Cards -->
         <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">Filtered Results</p>
+                            <h2 class="fw-bold mb-0" id="filtered-total">-</h2>
+                        </div>
+                        <div class="icon-box bg-soft-info">
+                            🔍
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-4">
                 <div class="stat-card p-4">
                     <div class="d-flex justify-content-between align-items-start">
@@ -317,19 +330,6 @@
                         </div>
                         <div class="icon-box bg-soft-success">
                             🏢
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1">Filtered Results</p>
-                            <h2 class="fw-bold mb-0" id="filtered-total">-</h2>
-                        </div>
-                        <div class="icon-box bg-soft-info">
-                            🔍
                         </div>
                     </div>
                 </div>
