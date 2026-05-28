@@ -65,15 +65,28 @@ Add something like this to your Apache configurations (`/etc/apache2/sites-avail
 <VirtualHost *:80>
     ServerName qms.yourdomain.com
 
-    # Proxy WebSocket Traffic
+    # 1. Forward the main interface pages
+    ProxyPass /qms/ http://127.0.0.1:5000/
+    ProxyPassReverse /qms/ http://127.0.0.1:5000/
+    ProxyPass /qms http://127.0.0.1:5000/
+    ProxyPassReverse /qms http://127.0.0.1:5000/
+
+    # 2. Forward the hardcoded asset/API paths from the HTML
+    ProxyPass /static http://127.0.0.1:5000/static
+    ProxyPassReverse /static http://127.0.0.1:5000/static
+
+    ProxyPass /api http://127.0.0.1:5000/api
+    ProxyPassReverse /api http://127.0.0.1:5000/api
+
+    # 3. Proxy WebSocket Traffic (Socket.IO) properly at the root level
     RewriteEngine On
     RewriteCond %{HTTP:Upgrade} websocket [NC]
-    RewriteRule /(.*) ws://127.0.0.1:5000/$1 [P,L]
+    RewriteRule ^/socket.io/(.*) ws://127.0.0.1:5000/socket.io/$1 [P,L]
 
-    # Proxy Standard HTTP Traffic
-    ProxyPass / http://127.0.0.1:5000/
-    ProxyPassReverse / http://127.0.0.1:5000/
-</VirtualHost>
+    ProxyPass /socket.io http://127.0.0.1:5000/socket.io
+    ProxyPassReverse /socket.io http://127.0.0.1:5000/socket.io
+    
+    </VirtualHost>
 ```
 
 *(Remember to run `sudo a2enmod proxy_wstunnel proxy_http rewrite` and `sudo systemctl restart apache2` if you implement this).*
