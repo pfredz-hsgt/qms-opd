@@ -3,13 +3,14 @@ import sys
 import csv
 import logging
 import subprocess
-from datetime import datetime
+from datetime import datetime, timedelta
+import time
+from threading import Lock, Thread
 from flask import Flask, render_template, request, jsonify
 import flask
 from flask_socketio import SocketIO, emit
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-from threading import Lock
 import firebase_admin
 from firebase_admin import credentials, db, messaging
 
@@ -187,6 +188,46 @@ class CSVLogger:
         except Exception as e:
             logger.error(f"Unexpected error reading calls by date: {e}")
             return []
+        
+    def cleanup_old_logs(self, days_to_keep: int = 30) -> None:
+        try:
+            if not os.path.exists(self.csv_path):
+                return
+            
+            # Calculate the cutoff date
+            cutoff_date = datetime.now() - timedelta(days=days_to_keep)
+            rows_to_keep = []
+            
+            # Use the lock to prevent reading/writing while a new call is being logged
+            with self._lock:
+                with open(self.csv_path, 'r', newline='', encoding='utf-8') as csvfile:
+                    reader = csv.DictReader(csvfile)
+                    headers = reader.fieldnames
+                    
+                    if not headers:
+                        return # Empty file
+
+                    for row in reader:
+                        try:
+                            # Parse the date from the CSV row
+                            row_date = datetime.strptime(row['date'], '%Y-%m-%d')
+                            # Keep if it is newer than or equal to the cutoff date
+                            if row_date >= cutoff_date:
+                                rows_to_keep.append(row)
+                        except ValueError:
+                            # If date parsing fails for some reason, keep the row to be safe
+                            rows_to_keep.append(row)
+                            
+                # Overwrite the file with only the recent rows
+                with open(self.csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+                    writer = csv.DictWriter(csvfile, fieldnames=headers)
+                    writer.writeheader()
+                    writer.writerows(rows_to_keep)
+                        
+            logger.info(f"Cleaned up CSV logs. Kept records from the last {days_to_keep} days.")
+        
+        except Exception as e:
+            logger.error(f"Failed to clean up old CSV logs: {e}")
 
 # --- Application Setup ---
 app = Flask(__name__, static_url_path='/static')
@@ -424,6 +465,20 @@ def update_and_broadcast_call(number: str, counter: str) -> None:
     except Exception as e:
         logger.error(f"Error updating and broadcasting call: {e}")
         raise
+
+def schedule_csv_cleanup(logger_instance: CSVLogger, days_to_keep: int = 30, interval_hours: int = 24):
+    """Runs a background task to clean up old CSV logs periodically."""
+    def cleanup_task():
+        while True:
+            # Sleep first so it doesn't run immediately on boot (optional, but good for fast restarts)
+            time.sleep(interval_hours * 3600) 
+            logger_instance.cleanup_old_logs(days_to_keep=days_to_keep)
+            
+    # Start as a daemon thread so it automatically closes when the Flask app stops
+    cleanup_thread = Thread(target=cleanup_task, daemon=True)
+    cleanup_thread.start()
+    logger.info(f"Scheduled automated CSV cleanup every {interval_hours} hours.")
+
 
 # --- SocketIO Event Handlers ---
 @socketio.on("connect")
@@ -781,6 +836,8 @@ if __name__ == "__main__":
     # Run cleanup on startup
     cleanup_old_firebase_data()
     cleanup_stale_tokens()
+    csv_logger.cleanup_old_logs(days_to_keep=30)
+    schedule_csv_cleanup(csv_logger, days_to_keep=30, interval_hours=24)
     socketio.run(
         app, 
         host=config.HOST, 
