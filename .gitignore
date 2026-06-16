@@ -26,7 +26,7 @@ MANIFEST
 serviceAccountKey.json
 firebase-config.txt
 firebase-messaging-sw.js
-
+qms-slide
 
 # Virtual Environment
 venv/
