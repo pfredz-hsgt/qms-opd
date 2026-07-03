@@ -10,7 +10,7 @@ START "" "C:\Program Files\Google\Chrome\Application\chrome.exe" ^
   --window-position=1920,0 ^
   --disable-infobars ^
   --disable-session-crashed-bubble ^
-  "https://hsegamat2.moh.gov.my/qms/display?kiosk=true"
+  "http://localhost:5000/display?kiosk=true"
 
 :: 2. Clear the screen and display the loading animation.
 CLS
@@ -26,4 +26,16 @@ FOR /L %%i IN (1,1,3) DO (
 
 :: 3. Finish the animation and close the window.
 ECHO ] Successfully loaded QMS Display!
-TIMEOUT /T 2 >nul
+
+REM === Step 3: Open Chrome with URL ===
+
+set "chromePath=C:\Program Files\Google\Chrome\Application\chrome.exe"
+set "url=http://localhost:5000/"
+
+REM Launch Chrome and immediately close this window
+start "" "%chromePath%" "%url%"
+ECHO ] Successfully loaded QMS Panel!
+ECHO.
+ECHO  This command window will now close!
+TIMEOUT /T 1 >nul
+

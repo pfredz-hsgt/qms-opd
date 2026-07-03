@@ -26,4 +26,16 @@ FOR /L %%i IN (1,1,3) DO (
 
 :: 3. Finish the animation and close the window.
 ECHO ] Successfully loaded QMS Display!
-TIMEOUT /T 2 >nul
+
+REM === Step 3: Open Chrome with URL ===
+
+set "chromePath=C:\Program Files\Google\Chrome\Application\chrome.exe"
+set "url=https://hsegamat2.moh.gov.my/qms/"
+
+REM Launch Chrome and immediately close this window
+start "" "%chromePath%" "%url%"
+ECHO ] Successfully loaded QMS Panel!
+ECHO.
+ECHO  This command window will now close!
+TIMEOUT /T 1 >nul
+

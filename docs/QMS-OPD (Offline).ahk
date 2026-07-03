@@ -1,5 +1,10 @@
 ﻿#Requires AutoHotkey v2.0+
 
+; === Step 1: Run Flask server ===
+batFile := A_ScriptDir "\1.Start-Server.bat"
+Run(batFile)
+Sleep 3000  ; wait for server to start
+
 ; === Step 2: Run patient display script ===
 batFile2 := A_ScriptDir "\2.LaunchDisplay.bat"
 Run(batFile2)

@@ -11,8 +11,8 @@ import flask
 from flask_socketio import SocketIO, emit
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-import firebase_admin
-from firebase_admin import credentials, db, messaging
+# import firebase_admin
+# from firebase_admin import credentials, db, messaging
 
 # --- Configuration ---
 @dataclass
@@ -38,14 +38,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # --- Firebase Setup ---
-try:
-    cred = credentials.Certificate('serviceAccountKey.json')
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': 'https://qms-hybrid-default-rtdb.asia-southeast1.firebasedatabase.app'
-    })
-    logger.info("Firebase Admin initialized successfully")
-except Exception as e:
-    logger.error(f"Failed to initialize Firebase: {e}")
+# try:
+#     cred = credentials.Certificate('serviceAccountKey.json')
+#     firebase_admin.initialize_app(cred, {
+#         'databaseURL': 'https://qms-hybrid-default-rtdb.asia-southeast1.firebasedatabase.app'
+#     })
+#     logger.info("Firebase Admin initialized successfully")
+# except Exception as e:
+#     logger.error(f"Failed to initialize Firebase: {e}")
 
 # --- Data Models ---
 @dataclass
@@ -456,10 +456,10 @@ def update_and_broadcast_call(number: str, counter: str) -> None:
         socketio.emit("current_state", current_state)
         
         # Sync to Cloud
-        sync_to_cloud(number, counter)
+        # sync_to_cloud(number, counter)
         
         # Send Push Notification
-        send_push_notification(number, counter)
+        # send_push_notification(number, counter)
         
         logger.info(f"Broadcasted call update: {number} at {counter}")
     except Exception as e:
@@ -711,19 +711,20 @@ def perform_update():
 
 @app.route('/api/active_notifications')
 def get_active_notifications():
-    try:
-        # Fetch all registered tokens for today
-        ref = db.reference('fcm_tokens/LOC_1')
-        tokens_data = ref.get()
+    return jsonify([])
+    # try:
+    #     # Fetch all registered tokens for today
+    #     ref = db.reference('fcm_tokens/LOC_1')
+    #     tokens_data = ref.get()
         
-        if not tokens_data:
-            return jsonify([])
+    #     if not tokens_data:
+    #         return jsonify([])
 
-        # Return just the ticket numbers that have active tokens
-        active_tickets = list(tokens_data.keys())
-        return jsonify(active_tickets)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    #     # Return just the ticket numbers that have active tokens
+    #     active_tickets = list(tokens_data.keys())
+    #     return jsonify(active_tickets)
+    #     except Exception as e:
+    #         return jsonify({"error": str(e)}), 500
 
 # --- CSV Logging API Endpoints ---
 @app.route('/api/logs/recent')
