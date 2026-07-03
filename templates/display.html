@@ -576,13 +576,13 @@
                     const defaultChannel = channels.find(channel => channel.name === defaultChannelName);
 
                     if (defaultChannel) {
-                    channelSelect.value = 'local_media_playlist';
-                    loadChannel();
+                        channelSelect.value = 'local_media_playlist';
+                        loadChannel();
                     }
-                    
+
                 } catch (error) {
                     console.error('Failed to load or parse playlist:', error);
-                // Fallback: Even if M3U fails, try to load local media
+                    // Fallback: Even if M3U fails, try to load local media
                     channelSelect.value = 'local_media_playlist';
                     loadChannel();
                 }
@@ -593,7 +593,7 @@
                     const res = await fetch('/api/media-list');
                     const data = await res.json();
                     if (data.status === 'success' && data.media_files.length > 0) {
-                        localMediaFiles = data.media_files.sort((a, b) => 
+                        localMediaFiles = data.media_files.sort((a, b) =>
                             a.toLowerCase().localeCompare(b.toLowerCase())
                         );
                         console.log(`📹 Loaded ${localMediaFiles.length} local media files`);
@@ -638,15 +638,15 @@
                     alert('Unsupported stream type.');
                 }
             }
-            
-                // Create an async initialization function to control the loading order
-                async function initializeApp() {
+
+            // Create an async initialization function to control the loading order
+            async function initializeApp() {
                 // 1. Await the local media fetch first so the array is populated
                 await fetchLocalMedia();
-                
+
                 // 2. Then load the playlist, which will now safely trigger the default local playback
                 await loadPlaylist();
-                
+
                 // 3. Finally, attach the change listener for the dropdown menu
                 channelSelect.addEventListener('change', loadChannel);
             }
@@ -1105,13 +1105,14 @@
 
         // --- Startup Behaviors ---
         function startAutoCountdown() {
-            let countdown = 600;
-            const isAutoplayAllowed = detectAutoplayPolicy();
-
-            if (isKioskMode && isAutoplayAllowed) {
+            if (isKioskMode) {
+                startScreen.style.display = 'none';
                 setTimeout(() => { autoStartDisplay(true); }, 1000);
                 return;
             }
+
+            let countdown = 10;
+            const isAutoplayAllowed = detectAutoplayPolicy();
 
             const countdownInterval = setInterval(() => {
                 countdownEl.textContent = countdown;
