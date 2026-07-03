@@ -531,11 +531,6 @@ def dashboard():
     """Serve the dashboard page."""
     return render_template("dashboard.html")
 
-# --- Temporary Portal Hosting ---
-@app.route("/portal")
-def patient_portal():
-    """Serve the patient portal (public/index.html)."""
-    return flask.send_from_directory('public', 'index.html')
 
 @app.route("/public/<path:filename>")
 def public_files(filename):

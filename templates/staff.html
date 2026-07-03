@@ -205,18 +205,53 @@
         }
 
         /* Keypad Layout Ordering */
-        .keypad-grid.layout-desktop [data-key="7"] { order: 1; }
-        .keypad-grid.layout-desktop [data-key="8"] { order: 2; }
-        .keypad-grid.layout-desktop [data-key="9"] { order: 3; }
-        .keypad-grid.layout-desktop [data-key="4"] { order: 4; }
-        .keypad-grid.layout-desktop [data-key="5"] { order: 5; }
-        .keypad-grid.layout-desktop [data-key="6"] { order: 6; }
-        .keypad-grid.layout-desktop [data-key="1"] { order: 7; }
-        .keypad-grid.layout-desktop [data-key="2"] { order: 8; }
-        .keypad-grid.layout-desktop [data-key="3"] { order: 9; }
-        .keypad-grid.layout-desktop [data-key="clear"] { order: 10; }
-        .keypad-grid.layout-desktop [data-key="0"] { order: 11; }
-        .keypad-grid.layout-desktop [data-key="enter"] { order: 12; }
+        .keypad-grid.layout-desktop [data-key="7"] {
+            order: 1;
+        }
+
+        .keypad-grid.layout-desktop [data-key="8"] {
+            order: 2;
+        }
+
+        .keypad-grid.layout-desktop [data-key="9"] {
+            order: 3;
+        }
+
+        .keypad-grid.layout-desktop [data-key="4"] {
+            order: 4;
+        }
+
+        .keypad-grid.layout-desktop [data-key="5"] {
+            order: 5;
+        }
+
+        .keypad-grid.layout-desktop [data-key="6"] {
+            order: 6;
+        }
+
+        .keypad-grid.layout-desktop [data-key="1"] {
+            order: 7;
+        }
+
+        .keypad-grid.layout-desktop [data-key="2"] {
+            order: 8;
+        }
+
+        .keypad-grid.layout-desktop [data-key="3"] {
+            order: 9;
+        }
+
+        .keypad-grid.layout-desktop [data-key="clear"] {
+            order: 10;
+        }
+
+        .keypad-grid.layout-desktop [data-key="0"] {
+            order: 11;
+        }
+
+        .keypad-grid.layout-desktop [data-key="enter"] {
+            order: 12;
+        }
 
         .key-btn {
             background: var(--key-bg);
@@ -253,44 +288,54 @@
             border-color: #0d47a1;
             box-shadow: 0 4px 0 #0a3578;
         }
+
         [data-theme="dark"] .key-btn.btn-action {
-            background-color: #4a1c1c; /* Dark reddish background */
-            color: #fca5a5;            /* Lighter red text for contrast */
+            background-color: #4a1c1c;
+            /* Dark reddish background */
+            color: #fca5a5;
+            /* Lighter red text for contrast */
             border-color: #340b0b;
             box-shadow: 0 4px 0 #340b0b;
         }
 
         [data-theme="dark"] .key-btn.btn-enter {
-            background: linear-gradient(135deg, #0c1335 0%, #20264d 100%); /* Slightly brighter blue gradient */
+            background: linear-gradient(135deg, #0c1335 0%, #20264d 100%);
+            /* Slightly brighter blue gradient */
             color: white;
             border-color: #283593;
             box-shadow: 0 4px 0 #1a237e;
         }
-        
+
         /* --- Light Theme Hover Effects --- */
         .key-btn.btn-action:hover {
-            background-color: #fcd5d5; /* Slightly darker/richer red */
+            background-color: #fcd5d5;
+            /* Slightly darker/richer red */
         }
 
         .key-btn.btn-enter:hover {
-            background: linear-gradient(135deg, #1565c0 0%, #283593 100%); /* Slightly brighter blue gradient */
+            background: linear-gradient(135deg, #1565c0 0%, #283593 100%);
+            /* Slightly brighter blue gradient */
         }
 
         /* --- Dark Theme Hover Effects --- */
         [data-theme="dark"] .key-btn.btn-action:hover {
-            background-color: #5c2323; /* Slightly lighter dark-red */
+            background-color: #5c2323;
+            /* Slightly lighter dark-red */
         }
 
         [data-theme="dark"] .key-btn.btn-enter:hover {
-            background: linear-gradient(135deg, #121c4d 0%, #2d366e 100%); /* Slightly brighter dark-blue gradient */
+            background: linear-gradient(135deg, #121c4d 0%, #2d366e 100%);
+            /* Slightly brighter dark-blue gradient */
         }
-        
+
         [data-theme="dark"] .display-screen.empty-state .text-muted,
         [data-theme="dark"] .display-screen .placeholder-text {
-            color: var(--text-main) !important; /* Uses your dark mode light text color */
-            opacity: 0.3 !important; /* Overrides the Bootstrap opacity-25 to be slightly more visible */
+            color: var(--text-main) !important;
+            /* Uses your dark mode light text color */
+            opacity: 0.3 !important;
+            /* Overrides the Bootstrap opacity-25 to be slightly more visible */
         }
-        
+
         /* Recent Calls List */
         .recent-calls-card {
             background: var(--bg-surface);
@@ -489,6 +534,55 @@
 </head>
 
 <body>
+    <!-- Login Overlay -->
+    <div id="login-overlay"
+        style="position: fixed; inset: 0; background: var(--bg-body); z-index: 10000; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s;">
+        <div class="card-custom p-5 text-center" style="max-width: 400px; width: 90%;">
+            <div class="mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="var(--primary-navy)"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M6.5 2a.5.5 0 0 0 0 1H1v2h5.5l7 7.5V11a.5.5 0 0 0 1 0v-4a.5.5 0 0 0 1 0V2h-9zM1 1v1h5.5L7 2.5V1a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1z" />
+                </svg>
+            </div>
+            <h3 class="fw-bold mb-4" style="color: var(--primary-navy);">QMS Farmasi Login</h3>
+            <form id="login-form" onsubmit="return handleLogin(event)">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="login-username" placeholder="Username" required>
+                    <label for="login-username">Username</label>
+                </div>
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control" id="login-password" placeholder="Password" required>
+                    <label for="login-password">Password</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold"
+                    style="background: var(--primary-navy); border: none;">Login</button>
+                <div id="login-error" class="text-danger mt-3 d-none small fw-bold">Invalid username or password</div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication immediately to prevent flashing content
+        if (localStorage.getItem('qms_staff_auth') === 'true') {
+            document.getElementById('login-overlay').style.display = 'none';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-username').value;
+            const pass = document.getElementById('login-password').value;
+
+            if (user === 'farmasi' && pass === 'farmasi') {
+                localStorage.setItem('qms_staff_auth', 'true');
+                const overlay = document.getElementById('login-overlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => { overlay.style.display = 'none'; }, 300);
+            } else {
+                document.getElementById('login-error').classList.remove('d-none');
+            }
+        }
+    </script>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
@@ -497,7 +591,7 @@
                     d="M6.5 2a.5.5 0 0 0 0 1H1v2h5.5l7 7.5V11a.5.5 0 0 0 1 0v-4a.5.5 0 0 0 1 0V2h-9zM1 1v1h5.5L7 2.5V1a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1z" />
             </svg>
             </svg>
-            QMS OPD 3.4
+            QMS OPD 3.5
         </div>
         <div class="sidebar-menu">
 
@@ -526,9 +620,9 @@
                 Open TV Display
             </a>
             <a href="https://qms-hybrid.web.app/" target="_blank" class="nav-link">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                    <path 
-                        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
                     </path>
                 </svg>
                 Open Mobile Link
@@ -572,7 +666,7 @@
                 style="background-color: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color);">
                 ☰ Menu
             </button>
-            <h5 class="fw-bold m-0 text-primary">QMS OPD 3.4</h5>
+            <h5 class="fw-bold m-0 text-primary">QMS OPD 3.5</h5>
         </div>
 
         <div class="row g-4">
@@ -585,15 +679,17 @@
                     </div>-->
 
                     <form id="call-form" onsubmit="return false;">
-                    <div class="keypad-container">
+                        <div class="keypad-container">
                             <input type="hidden" id="number-input-keypad" maxlength="5">
 
                             <div class="d-flex justify-content-end mb-2">
-                                <button type="button" class="btn btn-sm border-0 d-flex align-items-center gap-1" 
-                                    onclick="toggleKeypadLayout()" 
+                                <button type="button" class="btn btn-sm border-0 d-flex align-items-center gap-1"
+                                    onclick="toggleKeypadLayout()"
                                     style="font-color: var(--text-main); background-color: var(--soft-blue); font-size: 0.85rem; border-radius: 20px;">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                                     </svg>
                                     Swap
                                 </button>
@@ -650,24 +746,9 @@
                 </div>
             </div>
 
-            <!-- Mobile Access QR (Footer style) -->
-            <div class="col-12">
-                <div class="card-custom p-3" style="background-color: var(--soft-blue);">
-                    <div class="row align-items-center">
-                        <div class="col-md-12">
-                            <h6 class="fw-bold">📱 Mobile Access</h6>
-                            <p class="small mb-1">Scan to control from your phone. Ensure you are connected
-                                to Wi-Fi: <strong>Kualiti_Staf</strong> Password: <strong>2024@KualitiHS</strong> </p>
-                            <code class="small px-2 py-1 rounded border"
-                                style="background: var(--bg-surface); color: var(--text-main);"
-                                id="server-url">Loading IP...</code>
-                            <br />
-                            <canvas id="qrcode" style="margin-top: 10px; max-width: 80px;"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
+    </div>
     </div>
 
     <!-- Scripts -->
@@ -742,6 +823,12 @@
 
         // Keyboard Listener
         document.addEventListener("keydown", function (event) {
+            // Disable key listener if login overlay is visible
+            const loginOverlay = document.getElementById('login-overlay');
+            if (loginOverlay && loginOverlay.style.display !== 'none') {
+                return;
+            }
+
             // Shortcut Mode (Counter Switching)
             if (isShortcutActive) {
                 if (event.key >= '1' && event.key <= '5') {
@@ -803,20 +890,20 @@
             }
         });
 
-// --- Keypad Layout Management ---
+        // --- Keypad Layout Management ---
         let currentBreakpointIsDesktop = window.innerWidth >= 992;
 
         function applyLayout(layoutType) {
             const grid = document.querySelector('.keypad-grid');
             const isCurrentlyDesktop = grid.classList.contains('layout-desktop');
-            
+
             // Prevent animating if the layout is already correct
             if ((layoutType === 'desktop') === isCurrentlyDesktop) return;
 
             // 1. Fade out and shrink slightly
             grid.style.opacity = '0';
             grid.style.transform = 'scale(0.97)';
-            
+
             // 2. Wait for fade out, swap layout, then fade back in
             setTimeout(() => {
                 if (layoutType === 'desktop') {
@@ -824,7 +911,7 @@
                 } else {
                     grid.classList.remove('layout-desktop');
                 }
-                
+
                 // Fade back in
                 grid.style.opacity = '1';
                 grid.style.transform = 'scale(1)';
@@ -834,7 +921,7 @@
         function toggleKeypadLayout() {
             const grid = document.querySelector('.keypad-grid');
             const newLayout = grid.classList.contains('layout-desktop') ? 'mobile' : 'desktop';
-            
+
             // Save manual override preference
             localStorage.setItem('keypadLayoutOverride', newLayout);
             applyLayout(newLayout);
@@ -860,13 +947,13 @@
             // Listen for screen resizing to auto-swap
             window.addEventListener('resize', () => {
                 const newBreakpointIsDesktop = window.innerWidth >= 992;
-                
+
                 // Only trigger if we cross the mobile/desktop threshold (992px)
                 if (newBreakpointIsDesktop !== currentBreakpointIsDesktop) {
                     currentBreakpointIsDesktop = newBreakpointIsDesktop;
-                    
+
                     // Clear the manual override so it resets to the new device's default
-                    localStorage.removeItem('keypadLayoutOverride'); 
+                    localStorage.removeItem('keypadLayoutOverride');
                     applyLayout(currentBreakpointIsDesktop ? 'desktop' : 'mobile');
                 }
             });
@@ -1075,17 +1162,17 @@
             try {
                 const response = await fetch('/api/check_update');
                 const data = await response.json();
-                
+
                 if (data.update_available) {
                     showNotification('Update found! Downloading and installing...', 'info', 0, false);
                     const perfResp = await fetch('/api/perform_update', { method: 'POST' });
                     const perfData = await perfResp.json();
-                    
+
                     if (perfResp.ok && perfData.status === 'success') {
                         showNotification('Update successful! Server restarting...', 'success', 0, false);
                         setTimeout(() => {
                             window.location.reload(true);
-                        }, 5000); 
+                        }, 5000);
                     } else {
                         showNotification('Update failed: ' + (perfData.message || 'Unknown error'), 'error');
                     }
