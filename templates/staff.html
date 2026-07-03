@@ -10,7 +10,6 @@
 
     <!-- Scripts -->
     <script src="/static/js/socket.io.min.js"></script>
-    <script src="/static/js/qrcode.min.js"></script>
 
     <style>
         :root {
@@ -964,9 +963,6 @@
                 document.getElementById('counter-select').value = savedCounter;
             }
 
-            // Render QR Code (Removed since the panel was deleted)
-            // generateQRCode();
-
             // Add Keypad Listeners
             initializeKeypad();
 
@@ -1129,25 +1125,6 @@
                 recentCallsContainer.lastElementChild.remove();
             }
         }
-
-        function generateQRCode() {
-            const ip = location.hostname;
-            const port = location.port;
-            const url = `${location.protocol}//10.77.232.20/qms`;
-
-            document.getElementById('server-url').textContent = url;
-
-            QRCode.toCanvas(document.getElementById("qrcode"), url, {
-                width: 80,
-                color: {
-                    dark: "#1a237e",
-                    light: "#ffffff"
-                }
-            }, function (error) {
-                if (error) console.error(error);
-            });
-        }
-
         function confirmRestart() {
             if (confirm("Are you sure you want to RESTART the server logic? Only do this if the display is stuck.")) {
                 fetch('/api/restart', { method: 'POST' })
